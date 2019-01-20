@@ -11,6 +11,7 @@
 */
 
 static zend_object_handlers php_html5_dom_tree_handlers;
+static HashTable php_html5_dom_tree_prop_handlers;
 
 static zend_function_entry php_html5_dom_tree_methods[] = {
 	PHP_ME(DOM, __construct,			NULL,	ZEND_ACC_PRIVATE | ZEND_ACC_CTOR)
@@ -19,19 +20,38 @@ static zend_function_entry php_html5_dom_tree_methods[] = {
 
 void html5_dom_tree_class_init() {
 	memcpy(&php_html5_dom_tree_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-	php_html5_dom_tree_handlers.offset		= XtOffsetOf(html5_dom_object_wrap, std);
-	php_html5_dom_tree_handlers.free_obj	= html5_dom_tree_free_obj;
-	php_html5_dom_tree_handlers.clone_obj	= NULL;
+	php_html5_dom_tree_handlers.offset					= XtOffsetOf(html5_dom_object_wrap, std);
+	php_html5_dom_tree_handlers.free_obj				= html5_dom_tree_free_obj;
+	php_html5_dom_tree_handlers.clone_obj				= NULL;
+	
+	php_html5_dom_tree_handlers.read_property			= html5_dom_read_property;
+	php_html5_dom_tree_handlers.write_property			= html5_dom_write_property;
+	php_html5_dom_tree_handlers.get_property_ptr_ptr	= html5_dom_get_property_ptr_ptr;
+	php_html5_dom_tree_handlers.has_property			= html5_dom_has_property;
 	
 	zend_class_entry ce;
 	INIT_CLASS_ENTRY(ce, "HTML5\\DOM\\Tree", php_html5_dom_tree_methods);
 	ce.create_object = html5_dom_tree_create_object;
 	
 	html5_dom_tree_ce = zend_register_internal_class(&ce);
+	
+	html5_dom_prop_handler_list handlers[] = {
+		{"encoding",		html5_dom_tree__encoding}, 
+		{"encodingId",		html5_dom_tree__encodingId}, 
+		{"document",		html5_dom_tree__document}, 
+		{"root",			html5_dom_tree__root}, 
+		{"head",			html5_dom_tree__head}, 
+		{"body",			html5_dom_tree__body}, 
+		{"parser",			html5_dom_tree_parser}, 
+		{"",				NULL}, 
+	};
+	html5_dom_prop_handler_init(&php_html5_dom_tree_prop_handlers, handlers);
 }
 
 static zend_object *html5_dom_tree_create_object(zend_class_entry *ce TSRMLS_DC) {
 	html5_dom_object_wrap *intern = html5_dom_object_wrap_create(ce, &php_html5_dom_tree_handlers);
+	
+	intern->prop_handler = &php_html5_dom_tree_prop_handlers;
 	
 	DOM_GC_TRACE("DOM::Tree::new (refs=%d)", GC_REFCOUNT(&intern->std));
 	
@@ -47,15 +67,11 @@ static void html5_dom_tree_free_obj(zend_object *object TSRMLS_DC) {
 	if (tree_obj) {
 		zval *parent = (zval *) tree_obj->parent;
 		
-		fprintf(stderr, "parent=%p\n", parent);
-		
 		if (tree_obj->used) {
 			tree_obj->tree->context = NULL;
 		} else {
 			myhtml_tree_destroy(tree_obj->tree);
 		}
-		
-		fprintf(stderr, "GC_REFCOUNT(&parent->std)=%d\n", Z_REFCOUNT_P(parent));
 		
 		zval_ptr_dtor(parent);
 		efree(parent);
@@ -66,5 +82,55 @@ static void html5_dom_tree_free_obj(zend_object *object TSRMLS_DC) {
 }
 
 void html5_dom_tree_class_unload() {
-	// Nothing todo...
+	zend_hash_destroy(&php_html5_dom_tree_prop_handlers);
+}
+
+/*
+	Property acessors
+*/
+static int html5_dom_tree__encoding(html5_dom_object_wrap *obj, zval *val, int write) {
+	html5_dom_tree_t *self = (html5_dom_tree_t *) obj->ptr;
+	
+	if (!write) {
+		size_t length;
+		const char *name = myencoding_name_by_id(self->tree->encoding, &length);
+		
+		ZVAL_STRINGL(val, name, length);
+		
+		return 1;
+	}
+	
+	return 0;
+}
+
+static int html5_dom_tree__encodingId(html5_dom_object_wrap *obj, zval *val, int write) {
+	html5_dom_tree_t *self = (html5_dom_tree_t *) obj->ptr;
+	
+	if (!write) {
+		ZVAL_LONG(val, self->tree->encoding);
+		return 1;
+	}
+	
+	return 0;
+}
+
+static int html5_dom_tree__document(html5_dom_object_wrap *obj, zval *val, int write) {
+	return 0;
+}
+
+static int html5_dom_tree__root(html5_dom_object_wrap *obj, zval *val, int write) {
+	return 0;
+}
+
+static int html5_dom_tree__head(html5_dom_object_wrap *obj, zval *val, int write) {
+	return 0;
+}
+
+static int html5_dom_tree__body(html5_dom_object_wrap *obj, zval *val, int write) {
+	return 0;
+}
+
+static int html5_dom_tree_parser(html5_dom_object_wrap *obj, zval *val, int write) {
+	
+	return 0;
 }

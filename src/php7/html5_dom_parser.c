@@ -46,8 +46,6 @@ static zend_object *html5_dom_create_object(zend_class_entry *ce TSRMLS_DC) {
 }
 
 static void html5_dom_free_obj(zend_object *object TSRMLS_DC) {
-	fprintf(stderr, "html5_dom_free_obj!\n");
-	
 	html5_dom_object_wrap *obj = html5_dom_object_unwrap(object);
 	
 	DOM_GC_TRACE("DOM::DESTROY (refs=%d)", GC_REFCOUNT(&obj->std));
@@ -133,7 +131,7 @@ static void html5_dom_parse_options(html5_dom_options_t *opts, html5_dom_options
 	#endif
 }
 
-static bool html5_dom_check_options(html5_dom_options_t *opts) {
+static int html5_dom_check_options(html5_dom_options_t *opts) {
 	if (opts->encoding == MyENCODING_NOT_DETERMINED) {
 		zend_throw_exception_ex(html5_dom_exception_ce, 0, "invalid encoding value");
 		return 0;
@@ -150,7 +148,7 @@ static bool html5_dom_check_options(html5_dom_options_t *opts) {
 	return 1;
 }
 
-static void html5_dom_create_tree_object(zval *retval, myhtml_tree_t *tree, zval *parent, bool used) {
+static void html5_dom_create_tree_object(zval *retval, myhtml_tree_t *tree, zval *parent, int used) {
 	html5_dom_tree_t *tree_obj = (html5_dom_tree_t *) tree->context;
 	
 	if (tree_obj) {
