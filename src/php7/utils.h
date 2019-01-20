@@ -5,6 +5,7 @@
 // #define DOM_GC_TRACE(...)
 
 #include "php.h"
+#include <common/utils.h>
 
 #define html5_dom_object_unwrap(obj) ((html5_dom_object_wrap *)((char *)(obj) - XtOffsetOf(html5_dom_object_wrap, std)));
 
@@ -25,6 +26,8 @@ typedef struct {
 	const char name[64];
 	html5_dom_prop_handler func;
 } html5_dom_prop_handler_list;
+
+void html5_dom_node_to_zval(myhtml_tree_node_t *node, zval *retval);
 
 void html5_dom_prop_handler_init(HashTable *hash, html5_dom_prop_handler_list *handlers);
 void html5_dom_prop_handler_free(HashTable *hash);
