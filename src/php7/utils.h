@@ -15,9 +15,10 @@
 	T *self = (T *) self_object->ptr;
 
 typedef struct {
-	void *ptr;
-	HashTable *prop_handler;
-	zend_object std;
+	void *ptr;					// custom payload
+	HashTable *prop_handler;	// handlers for class properties
+	zval parent;				// reference to parent object
+	zend_object std;			// self object
 } html5_dom_object_wrap;
 
 typedef int (*html5_dom_prop_handler)(html5_dom_object_wrap *obj, zval *val, int write);

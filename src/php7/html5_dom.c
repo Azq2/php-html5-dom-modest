@@ -62,6 +62,7 @@ static PHP_MINIT_FUNCTION(html5_dom) {
 	html5_dom_exception_class_init();
 	html5_dom_class_init();
 	html5_dom_tree_class_init();
+	html5_dom_node_class_init();
 	return SUCCESS;
 }
 
@@ -69,6 +70,7 @@ static PHP_MSHUTDOWN_FUNCTION(html5_dom) {
 	html5_dom_exception_class_unload();
 	html5_dom_class_unload();
 	html5_dom_tree_class_unload();
+	html5_dom_node_class_unload();
 	return SUCCESS;
 }
 

@@ -1,9 +1,5 @@
 #include "utils.h"
 
-void html5_dom_node_to_zval(myhtml_tree_node_t *node, zval *retval) {
-	
-}
-
 void *html5_dom_zend_object_alloc(size_t obj_size, zend_class_entry *ce) {
 	void *obj = emalloc(obj_size + zend_object_properties_size(ce));
 	/* Subtraction of sizeof(zval) is necessary, because zend_object_properties_size() may be

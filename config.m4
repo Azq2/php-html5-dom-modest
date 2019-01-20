@@ -22,6 +22,7 @@ if test "${PHP_HTML5_DOM}" != "no"; then
 		src/php7/html5_dom.c \
 		src/php7/html5_dom_parser.c \
 		src/php7/html5_dom_tree.c \
+		src/php7/html5_dom_node.c \
 		src/php7/html5_dom_exception.c \
 		src/php7/utils.c \
 		src/common/utils.c \

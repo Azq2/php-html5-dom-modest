@@ -14,7 +14,7 @@ static zend_object_handlers php_html5_dom_tree_handlers;
 static HashTable php_html5_dom_tree_prop_handlers;
 
 static zend_function_entry php_html5_dom_tree_methods[] = {
-	PHP_ME(DOM, __construct,			NULL,	ZEND_ACC_PRIVATE | ZEND_ACC_CTOR)
+	PHP_ME(Tree, __construct,			NULL,	ZEND_ACC_PRIVATE | ZEND_ACC_CTOR)
 	PHP_FE_END
 };
 
@@ -40,6 +40,7 @@ void html5_dom_tree_class_init() {
 		{"encodingId",		html5_dom_tree__encodingId}, 
 		{"document",		html5_dom_tree__document}, 
 		{"root",			html5_dom_tree__root}, 
+		{"html",			html5_dom_tree__root}, 
 		{"head",			html5_dom_tree__head}, 
 		{"body",			html5_dom_tree__body}, 
 		{"parser",			html5_dom_tree_parser}, 
@@ -65,24 +66,28 @@ static void html5_dom_tree_free_obj(zend_object *object TSRMLS_DC) {
 	
 	html5_dom_tree_t *tree_obj = (html5_dom_tree_t *) obj->ptr;
 	if (tree_obj) {
-		zval *parent = (zval *) tree_obj->parent;
-		
 		if (tree_obj->used) {
 			tree_obj->tree->context = NULL;
 		} else {
 			myhtml_tree_destroy(tree_obj->tree);
 		}
 		
-		zval_ptr_dtor(parent);
-		efree(parent);
 		efree(tree_obj);
 	}
 	
+	zval_ptr_dtor(&obj->parent);
 	html5_dom_object_wrap_free(obj);
 }
 
 void html5_dom_tree_class_unload() {
 	zend_hash_destroy(&php_html5_dom_tree_prop_handlers);
+}
+
+/*
+	PHP methods
+*/
+PHP_METHOD(Tree, __construct) {
+	
 }
 
 /*

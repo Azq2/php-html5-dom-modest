@@ -20,33 +20,33 @@ static int html5_dom_tree__head(html5_dom_object_wrap *obj, zval *val, int write
 static int html5_dom_tree__body(html5_dom_object_wrap *obj, zval *val, int write);
 static int html5_dom_tree_parser(html5_dom_object_wrap *obj, zval *val, int write);
 
-PHP_METHOD(DOM, __construct);
-PHP_METHOD(DOM, createElement);
-PHP_METHOD(DOM, createComment);
-PHP_METHOD(DOM, createTextNode);
-PHP_METHOD(DOM, parseFragment);
-PHP_METHOD(DOM, document); // field
-PHP_METHOD(DOM, root); // field
-PHP_METHOD(DOM, head); // field
-PHP_METHOD(DOM, body); // field
-PHP_METHOD(DOM, at);
-PHP_METHOD(DOM, querySelector);
-PHP_METHOD(DOM, find);
-PHP_METHOD(DOM, querySelectorAll);
-PHP_METHOD(DOM, findId);
-PHP_METHOD(DOM, getElementById);
-PHP_METHOD(DOM, findTag);
-PHP_METHOD(DOM, getElementsByTagName);
-PHP_METHOD(DOM, findClass);
-PHP_METHOD(DOM, getElementsByClassName);
-PHP_METHOD(DOM, findAttr);
-PHP_METHOD(DOM, getElementByAttribute);
-PHP_METHOD(DOM, encoding); // field
-PHP_METHOD(DOM, encodingId); // field
-PHP_METHOD(DOM, tag2id);
-PHP_METHOD(DOM, id2tag);
-PHP_METHOD(DOM, namespace2id);
-PHP_METHOD(DOM, id2namespace);
-PHP_METHOD(DOM, parser); // field
+PHP_METHOD(Tree, __construct);
+PHP_METHOD(Tree, createElement);
+PHP_METHOD(Tree, createComment);
+PHP_METHOD(Tree, createTextNode);
+PHP_METHOD(Tree, parseFragment);
+PHP_METHOD(Tree, document); // field
+PHP_METHOD(Tree, root); // field
+PHP_METHOD(Tree, head); // field
+PHP_METHOD(Tree, body); // field
+PHP_METHOD(Tree, at);
+PHP_METHOD(Tree, querySelector);
+PHP_METHOD(Tree, find);
+PHP_METHOD(Tree, querySelectorAll);
+PHP_METHOD(Tree, findId);
+PHP_METHOD(Tree, getElementById);
+PHP_METHOD(Tree, findTag);
+PHP_METHOD(Tree, getElementsByTagName);
+PHP_METHOD(Tree, findClass);
+PHP_METHOD(Tree, getElementsByClassName);
+PHP_METHOD(Tree, findAttr);
+PHP_METHOD(Tree, getElementByAttribute);
+PHP_METHOD(Tree, encoding); // field
+PHP_METHOD(Tree, encodingId); // field
+PHP_METHOD(Tree, tag2id);
+PHP_METHOD(Tree, id2tag);
+PHP_METHOD(Tree, namespace2id);
+PHP_METHOD(Tree, id2namespace);
+PHP_METHOD(Tree, parser); // field
 
 #endif // PHP_HTML5_DOM_TREE_H

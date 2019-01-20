@@ -158,26 +158,30 @@ static void html5_dom_create_tree_object(zval *retval, myhtml_tree_t *tree, zval
 		return;
 	}
 	
+	// new HTML5\DOM\Tree
 	object_init_ex(retval, html5_dom_tree_ce);
 	
+	// Save reference to parent
+	// That would not deleted parser object while at least one tree object live
 	html5_dom_object_wrap *intern = html5_dom_object_unwrap(Z_OBJ_P(retval));
+	ZVAL_COPY(&intern->parent, parent);
+	
 	html5_dom_object_wrap *parent_intern = html5_dom_object_unwrap(Z_OBJ_P(parent));
 	
-	tree->context = emalloc(sizeof(html5_dom_tree_t));
-	tree_obj = (html5_dom_tree_t *) tree->context;
-	
+	tree_obj = (html5_dom_tree_t *) emalloc(sizeof(html5_dom_tree_t));
 	tree_obj->tree = tree;
-	tree_obj->parent = emalloc(sizeof(zval));
 	tree_obj->parser = (html5_dom_parser_t *) parent_intern->ptr;
 	tree_obj->fragment_tag_id = MyHTML_TAG__UNDEF;
 	tree_obj->used = used;
-	
-	intern->ptr = tree_obj;
 	tree_obj->sv = intern;
 	
-	ZVAL_COPY(tree_obj->parent, parent);
+	tree->context = tree_obj;
+	intern->ptr = tree_obj;
 }
 
+/*
+	PHP methods
+*/
 PHP_METHOD(DOM, __construct) {
 	HTML5_DOM_METHOD_PARAMS(html5_dom_parser_t);
 	
