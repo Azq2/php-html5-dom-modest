@@ -1,0 +1,4 @@
+#ifndef PHP_HTML5_DOM_CSS_H
+#define PHP_HTML5_DOM_CSS_H
+
+#endif // PHP_HTML5_DOM_CSS_H
