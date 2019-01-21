@@ -125,77 +125,82 @@ void html5_dom_tree_class_unload() {
 /*
 	Finder helpers
 */
-/*
-static SV *html5_dom_find(CV *cv, html5_dom_parser_t *parser, myhtml_tree_node_t *scope, SV *query, SV *combinator, bool one) {
+void html5_dom_find(zval *retval, html5_dom_parser_t *parser, myhtml_tree_node_t *scope, zval *selector, zend_string *combinator, int one) {
 	mystatus_t status;
 	mycss_selectors_entries_list_t *list = NULL;
 	size_t list_size = 0;
-	mycss_selectors_list_t *selector = NULL;
+	mycss_selectors_list_t *parsed_selector = NULL;
 	modest_finder_selector_combinator_f selector_func = modest_finder_node_combinator_descendant;
-	SV *result = &PL_sv_undef;
 	
 	// Custom combinator as args
-	if (combinator) {
-		query = sv_stringify(query);
-		
-		STRLEN combo_len;
-		const char *combo = SvPV_const(combinator, combo_len);
-		
-		if (combo_len > 0)
-			selector_func = html5_find_selector_func(combo, combo_len);
-	}
+	if (combinator && combinator->len > 0)
+		selector_func = html5_find_selector_func(combinator->val, combinator->len);
 	
-	if (SvROK(query)) {
-		if (sv_derived_from(query, "HTML5::DOM::CSS::Selector")) { // Precompiler selectors
-			html5_css_selector_t *selector = INT2PTR(html5_css_selector_t *, SvIV((SV*)SvRV(query)));
-			list = selector->list->entries_list;
-			list_size = selector->list->entries_list_length;
-		} else if (sv_derived_from(query, "HTML5::DOM::CSS::Selector::Entry")) { // One precompiled selector
-			html5_css_selector_entry_t *selector = INT2PTR(html5_css_selector_entry_t *, SvIV((SV*)SvRV(query)));
-			list = selector->list;
-			list_size = 1;
-		} else {
-			sub_croak(cv, "%s: %s is not of type %s or %s", "HTML5::DOM::Tree::find", "query", "HTML5::DOM::CSS::Selector", "HTML5::DOM::CSS::Selector::Entry");
-		}
-	} else {
-		// String selector, compile it
-		query = sv_stringify(query);
+	// Precompiled selector
+	if (Z_TYPE_P(selector) == IS_OBJECT) {
+		/*
+			if (sv_derived_from(query, "HTML5::DOM::CSS::Selector")) { // Precompiler selectors
+				html5_css_selector_t *selector = INT2PTR(html5_css_selector_t *, SvIV((SV*)SvRV(query)));
+				list = selector->list->entries_list;
+				list_size = selector->list->entries_list_length;
+			} else if (sv_derived_from(query, "HTML5::DOM::CSS::Selector::Entry")) { // One precompiled selector
+				html5_css_selector_entry_t *selector = INT2PTR(html5_css_selector_entry_t *, SvIV((SV*)SvRV(query)));
+				list = selector->list;
+				list_size = 1;
+			} else {
+				sub_croak(cv, "%s: %s is not of type %s or %s", "HTML5::DOM::Tree::find", "query", "HTML5::DOM::CSS::Selector", "HTML5::DOM::CSS::Selector::Entry");
+			}
+		*/
+		zend_throw_exception_ex(html5_dom_exception_ce, 0, "invalid selector value (must be a string or precompiled selector)");
+		ZVAL_NULL(retval);
+		return;
+	}
+	// Selector from string
+	else {
+		convert_to_string(selector);
 		
-		STRLEN query_len;
-		const char *query_str = SvPV_const(query, query_len);
+		if (Z_TYPE_P(selector) != IS_STRING) {
+			zend_throw_exception_ex(html5_dom_exception_ce, 0, "invalid selector value (must be a string or precompiled selector)");
+			ZVAL_NULL(retval);
+			return;
+		}
+		
+		size_t query_len = Z_STRLEN_P(selector);
+		const char *query_str = Z_STRVAL_P(selector);
 		
 		status = html5_dom_init_css(parser);
-		if (status)
-			sub_croak(cv, "mycss_init failed: %d (%s)", status, modest_strerror(status));
+		if (status) {
+			zend_throw_exception_ex(html5_dom_exception_ce, status, "mycss_init failed: %d (%s)", status, modest_strerror(status));
+			ZVAL_NULL(retval);
+			return;
+		}
 		
-		selector = html5_parse_selector(parser->mycss_entry, query_str, query_len, &status);
+		parsed_selector = html5_parse_selector(parser->mycss_entry, query_str, query_len, &status);
 		
-		if (!selector)
-			sub_croak(cv, "bad selector: %s", query_str);
+		if (!parsed_selector) {
+			zend_throw_exception_ex(html5_dom_exception_ce, status, "bad selector: %s", query_str);
+			ZVAL_NULL(retval);
+			return;
+		}
 		
-		list = selector->entries_list;
-		list_size = selector->entries_list_length;
+		list = parsed_selector->entries_list;
+		list_size = parsed_selector->entries_list_length;
 	}
 	
 	if (one) { // search one element
 		myhtml_tree_node_t *node = (myhtml_tree_node_t *) html5_node_finder(parser, selector_func, scope, list, list_size, &status, 1);
-		result = node_to_sv(node);
+		html5_dom_node_to_zval(node, retval);
 	} else { // search multiple elements
 		myhtml_collection_t *collection = (myhtml_collection_t *) html5_node_finder(parser, selector_func, scope, list, list_size, &status, 0);
-		result = collection_to_blessed_array(collection);
-		if (collection)
-			myhtml_collection_destroy(collection);
+		html5_dom_collection_to_zval(scope->tree, collection, retval);
 	}
 	
 	// destroy parsed selector
-	if (selector)
-		mycss_selectors_list_destroy(mycss_entry_selectors(parser->mycss_entry), selector, true);
-	
-	return result;
+	if (parsed_selector)
+		mycss_selectors_list_destroy(mycss_entry_selectors(parser->mycss_entry), parsed_selector, true);
 }
-* */
 
-static void html5_dom_simple_find(zval *retval, myhtml_tree_node_t *self, zend_string *key, zend_string *val, zend_string *cmp, zend_bool icase, char type) {
+void html5_dom_simple_find(zval *retval, myhtml_tree_node_t *self, zend_string *key, zend_string *val, zend_string *cmp, zend_bool icase, char type) {
 	if (!self) {
 		ZVAL_NULL(retval);
 		return;
@@ -381,11 +386,29 @@ PHP_METHOD(Tree, parseFragment) {
 }
 
 PHP_METHOD(Tree, at) {
+	HTML5_DOM_METHOD_PARAMS(html5_dom_tree_t);
 	
+	zval *selector = NULL;
+	zend_string *combinator;
+	
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z|S", &selector, &combinator) != SUCCESS)
+		WRONG_PARAM_COUNT;
+	
+	myhtml_tree_node_t *scope = myhtml_tree_get_document(self->tree);
+	html5_dom_find(return_value, self->parser, scope, selector, combinator, 1);
 }
 
 PHP_METHOD(Tree, find) {
+	HTML5_DOM_METHOD_PARAMS(html5_dom_tree_t);
 	
+	zval *selector = NULL;
+	zend_string *combinator;
+	
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z|S", &selector, &combinator) != SUCCESS)
+		WRONG_PARAM_COUNT;
+	
+	myhtml_tree_node_t *scope = myhtml_tree_get_document(self->tree);
+	html5_dom_find(return_value, self->parser, scope, selector, combinator, 0);
 }
 
 PHP_METHOD(Tree, findId) {
@@ -430,19 +453,60 @@ PHP_METHOD(Tree, findAttr) {
 }
 
 PHP_METHOD(Tree, tag2id) {
+	HTML5_DOM_METHOD_PARAMS(html5_dom_tree_t);
 	
+	zend_string *tag_name = NULL;
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "S", &tag_name) != SUCCESS)
+		WRONG_PARAM_COUNT;
+	
+	RETURN_LONG(html5_dom_tag_id_by_name(self->tree, tag_name->val, tag_name->len, false));
 }
 
 PHP_METHOD(Tree, id2tag) {
+	HTML5_DOM_METHOD_PARAMS(html5_dom_tree_t);
 	
+	zend_long tag_id = 0;
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &tag_id) != SUCCESS)
+		WRONG_PARAM_COUNT;
+	
+	const myhtml_tag_context_t *tag_ctx = myhtml_tag_get_by_id(self->tree->tags, tag_id);
+	if (tag_ctx) {
+		RETURN_STRINGL(tag_ctx->name, tag_ctx->name_length);
+	} else {
+		RETURN_NULL();
+	}
 }
 
 PHP_METHOD(Tree, namespace2id) {
+	HTML5_DOM_METHOD_PARAMS(html5_dom_tree_t);
 	
+	zend_string *ns_name = NULL;
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "S", &ns_name) != SUCCESS)
+		WRONG_PARAM_COUNT;
+	
+	myhtml_namespace_t ns_id;
+	if (!myhtml_namespace_id_by_name(ns_name->val, ns_name->len, &ns_id))
+		ns_id = MyHTML_NAMESPACE_UNDEF;
+	
+	RETURN_LONG(ns_id);
 }
 
 PHP_METHOD(Tree, id2namespace) {
+	HTML5_DOM_METHOD_PARAMS(html5_dom_tree_t);
 	
+	zend_long ns_id = 0;
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &ns_id) != SUCCESS)
+		WRONG_PARAM_COUNT;
+	
+	size_t ns_len = 0;
+	const char *ns_name = myhtml_namespace_name_by_id(ns_id, &ns_len);
+	
+	const myhtml_tag_context_t *tag_ctx = myhtml_tag_get_by_id(self->tree->tags, ns_id);
+	if (ns_name) {
+		RETURN_STRINGL(ns_name, ns_len);
+	} else {
+		RETURN_NULL();
+	}
 }
 
 HTML5_DOM_TREE_FIELD_METHOD_RO(document, document);
