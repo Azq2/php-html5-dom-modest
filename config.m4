@@ -20,6 +20,9 @@ if test "${PHP_HTML5_DOM}" != "no"; then
 	
 	PHP_NEW_EXTENSION(html5_dom, [
 		src/php7/html5_dom.c \
+		src/php7/html5_dom_css.c \
+		src/php7/html5_dom_css_selector.c \
+		src/php7/html5_dom_css_selector_entry.c \
 		src/php7/html5_dom_parser.c \
 		src/php7/html5_dom_tree.c \
 		src/php7/html5_dom_node.c \
