@@ -18,7 +18,7 @@ static int html5_dom_tree__document(html5_dom_object_wrap *obj, zval *val, int w
 static int html5_dom_tree__root(html5_dom_object_wrap *obj, zval *val, int write);
 static int html5_dom_tree__head(html5_dom_object_wrap *obj, zval *val, int write);
 static int html5_dom_tree__body(html5_dom_object_wrap *obj, zval *val, int write);
-static int html5_dom_tree_parser(html5_dom_object_wrap *obj, zval *val, int write);
+static int html5_dom_tree__parser(html5_dom_object_wrap *obj, zval *val, int write);
 
 PHP_METHOD(Tree, __construct);
 PHP_METHOD(Tree, createElement);

@@ -19,6 +19,7 @@ static zend_function_entry php_html5_dom_node_methods[] = {
 };
 
 void html5_dom_node_class_init() {
+	zend_class_entry ce;
 	memcpy(&php_html5_dom_node_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	php_html5_dom_node_handlers.offset					= XtOffsetOf(html5_dom_object_wrap, std);
 	php_html5_dom_node_handlers.free_obj				= html5_dom_node_free_obj;
@@ -29,11 +30,33 @@ void html5_dom_node_class_init() {
 	php_html5_dom_node_handlers.get_property_ptr_ptr	= html5_dom_get_property_ptr_ptr;
 	php_html5_dom_node_handlers.has_property			= html5_dom_has_property;
 	
-	zend_class_entry ce;
 	INIT_CLASS_ENTRY(ce, "HTML5\\DOM\\Node", php_html5_dom_node_methods);
 	ce.create_object = html5_dom_node_create_object;
-	
 	html5_dom_node_ce = zend_register_internal_class(&ce);
+	
+	INIT_CLASS_ENTRY(ce, "HTML5\\DOM\\Element", php_html5_dom_node_methods);
+	ce.create_object = html5_dom_node_create_object;
+	html5_dom_node_element_ce = zend_register_internal_class_ex(&ce, html5_dom_node_ce);
+	
+	INIT_CLASS_ENTRY(ce, "HTML5\\DOM\\Document", php_html5_dom_node_methods);
+	ce.create_object = html5_dom_node_create_object;
+	html5_dom_node_document_ce = zend_register_internal_class_ex(&ce, html5_dom_node_ce);
+	
+	INIT_CLASS_ENTRY(ce, "HTML5\\DOM\\Fragment", php_html5_dom_node_methods);
+	ce.create_object = html5_dom_node_create_object;
+	html5_dom_node_fragment_ce = zend_register_internal_class_ex(&ce, html5_dom_node_ce);
+	
+	INIT_CLASS_ENTRY(ce, "HTML5\\DOM\\Text", php_html5_dom_node_methods);
+	ce.create_object = html5_dom_node_create_object;
+	html5_dom_node_text_ce = zend_register_internal_class_ex(&ce, html5_dom_node_ce);
+	
+	INIT_CLASS_ENTRY(ce, "HTML5\\DOM\\Comment", php_html5_dom_node_methods);
+	ce.create_object = html5_dom_node_create_object;
+	html5_dom_node_comment_ce = zend_register_internal_class_ex(&ce, html5_dom_node_ce);
+	
+	INIT_CLASS_ENTRY(ce, "HTML5\\DOM\\DocType", php_html5_dom_node_methods);
+	ce.create_object = html5_dom_node_create_object;
+	html5_dom_node_doctype_ce = zend_register_internal_class_ex(&ce, html5_dom_node_ce);
 	
 	html5_dom_prop_handler_list handlers[] = {
 		{"",				NULL}, 
@@ -84,6 +107,29 @@ void html5_dom_node_class_unload() {
 	zend_hash_destroy(&php_html5_dom_node_prop_handlers);
 }
 
+static inline zend_class_entry *html5_dom_get_node_class(myhtml_tree_node_t *node) {
+	html5_dom_tree_t *context = (html5_dom_tree_t *) node->tree->context;
+	
+	if (node->tag_id != MyHTML_TAG__UNDEF) {
+		if (node->tag_id == MyHTML_TAG__TEXT) {
+			return html5_dom_node_text_ce;
+		} else if (node->tag_id == MyHTML_TAG__COMMENT) {
+			return html5_dom_node_comment_ce;
+		} else if (node->tag_id == MyHTML_TAG__DOCTYPE) {
+			return html5_dom_node_doctype_ce;
+		} else if (context->fragment_tag_id && node->tag_id == context->fragment_tag_id) {
+			return html5_dom_node_fragment_ce;
+		}
+		return html5_dom_node_element_ce;
+	}
+	
+	// Modest myhtml bug - document node has tag_id == MyHTML_TAG__UNDEF
+	if (node_is_document(node))
+		return html5_dom_node_document_ce;
+	
+	return html5_dom_node_ce;
+}
+
 void html5_dom_node_to_zval(myhtml_tree_node_t *node, zval *retval) {
 	html5_dom_object_wrap *intern = (html5_dom_object_wrap *) myhtml_node_get_data(node);
 	
@@ -94,7 +140,7 @@ void html5_dom_node_to_zval(myhtml_tree_node_t *node, zval *retval) {
 	}
 	
 	// new HTML5\DOM\Node
-	object_init_ex(retval, html5_dom_node_ce);
+	object_init_ex(retval, html5_dom_get_node_class(node));
 	intern = html5_dom_object_unwrap(Z_OBJ_P(retval));
 	
 	intern->ptr = node;

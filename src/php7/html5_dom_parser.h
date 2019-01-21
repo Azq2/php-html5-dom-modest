@@ -9,6 +9,9 @@ zend_class_entry *html5_dom_ce;
 void html5_dom_class_init();
 void html5_dom_class_unload();
 
+int html5_dom_check_options(html5_dom_options_t *opts);
+void html5_dom_parse_options(html5_dom_options_t *opts, html5_dom_options_t *extend, zval *options);
+
 static void html5_dom_free_obj(zend_object *object TSRMLS_DC);
 static zend_object *html5_dom_create_object(zend_class_entry *ce TSRMLS_DC);
 

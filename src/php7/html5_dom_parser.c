@@ -115,7 +115,7 @@ static myencoding_t hv_get_encoding_value(zval *val, const char *key, int length
 	return def;
 }
 
-static void html5_dom_parse_options(html5_dom_options_t *opts, html5_dom_options_t *extend, zval *options) {
+void html5_dom_parse_options(html5_dom_options_t *opts, html5_dom_options_t *extend, zval *options) {
 	opts->threads					= hv_get_int_value(options, "threads", 7, extend ? extend->threads : 0);
 	opts->ignore_whitespace			= hv_get_int_value(options, "ignore_whitespace", 17, extend ? extend->ignore_whitespace : 0) > 0;
 	opts->ignore_doctype			= hv_get_int_value(options, "ignore_doctype", 14, extend ? extend->ignore_doctype : 0) > 0;
@@ -131,7 +131,7 @@ static void html5_dom_parse_options(html5_dom_options_t *opts, html5_dom_options
 	#endif
 }
 
-static int html5_dom_check_options(html5_dom_options_t *opts) {
+int html5_dom_check_options(html5_dom_options_t *opts) {
 	if (opts->encoding == MyENCODING_NOT_DETERMINED) {
 		zend_throw_exception_ex(html5_dom_exception_ce, 0, "invalid encoding value");
 		return 0;

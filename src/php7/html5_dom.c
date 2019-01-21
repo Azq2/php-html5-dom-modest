@@ -11,6 +11,7 @@
 #include <php7/html5_dom_parser.h>
 #include <php7/html5_dom_tree.h>
 #include <php7/html5_dom_node.h>
+#include <php7/html5_dom_collection.h>
 #include <php7/html5_dom_css.h>
 #include <php7/html5_dom_encoding.h>
 #include <common/utils.h>
@@ -63,6 +64,7 @@ static PHP_MINIT_FUNCTION(html5_dom) {
 	html5_dom_class_init();
 	html5_dom_tree_class_init();
 	html5_dom_node_class_init();
+	html5_dom_collection_class_init();
 	return SUCCESS;
 }
 
@@ -71,6 +73,7 @@ static PHP_MSHUTDOWN_FUNCTION(html5_dom) {
 	html5_dom_class_unload();
 	html5_dom_tree_class_unload();
 	html5_dom_node_class_unload();
+	html5_dom_collection_class_unload();
 	return SUCCESS;
 }
 
