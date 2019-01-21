@@ -38,6 +38,15 @@ static zend_function_entry php_html5_dom_collection_methods[] = {
 	PHP_ME(Collection, valid,			arginfo_collection_void,			ZEND_ACC_PUBLIC)
 	PHP_ME(Collection, rewind,			arginfo_collection_void,			ZEND_ACC_PUBLIC)
 	PHP_ME(Collection, current,			arginfo_collection_void,			ZEND_ACC_PUBLIC)
+	PHP_ME(Collection, array,			arginfo_collection_void,			ZEND_ACC_PUBLIC)
+	PHP_ME(Collection, first,			arginfo_collection_void,			ZEND_ACC_PUBLIC)
+	PHP_ME(Collection, last,			arginfo_collection_void,			ZEND_ACC_PUBLIC)
+	
+	// aliases
+	PHP_MALIAS(Collection,	item,		offsetGet,			arginfo_collection_offset,		ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Collection,	length,		count,				arginfo_collection_void,		ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Collection,	toArray,	array,				arginfo_collection_void,		ZEND_ACC_PUBLIC)
+	
 	PHP_FE_END
 };
 
@@ -69,6 +78,7 @@ static zend_object *html5_dom_collection_create_object(zend_class_entry *ce TSRM
 	html5_dom_object_wrap *intern = html5_dom_object_wrap_create(ce, &php_html5_dom_collection_handlers);
 	
 	intern->prop_handler = &php_html5_dom_collection_prop_handlers;
+	intern->iter = 0;
 	
 	DOM_GC_TRACE("DOM::Collection::new (refs=%d)", GC_REFCOUNT(&intern->std));
 	
@@ -110,43 +120,102 @@ PHP_METHOD(Collection, __construct) {
 	
 }
 
+PHP_METHOD(Collection, array) {
+	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
+	
+	array_init(return_value);
+	for (size_t i = 0; i < self->length; ++i) {
+		zval tmp;
+		html5_dom_node_to_zval(self->list[0], &tmp);
+		add_index_zval(return_value, i, &tmp);
+	}
+}
+
+PHP_METHOD(Collection, first) {
+	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
+	
+	if (self->length > 0) {
+		html5_dom_node_to_zval(self->list[0], return_value);
+	} else {
+		RETURN_NULL();
+	}
+}
+
+PHP_METHOD(Collection, last) {
+	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
+	
+	if (self->length > 0) {
+		html5_dom_node_to_zval(self->list[self->length - 1], return_value);
+	} else {
+		RETURN_NULL();
+	}
+}
+
 PHP_METHOD(Collection, count) {
 	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
 	RETURN_LONG(self->length);
 }
 
 PHP_METHOD(Collection, offsetExists) {
+	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
 	
+	zend_long offset = 0;
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &offset) != SUCCESS)
+		WRONG_PARAM_COUNT;
+	
+	RETURN_BOOL(offset >= 0 && offset < self->length);
 }
 
 PHP_METHOD(Collection, offsetGet) {
+	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
 	
+	zend_long offset = 0;
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &offset) != SUCCESS)
+		WRONG_PARAM_COUNT;
+	
+	if (offset >= 0 && offset < self->length) {
+		html5_dom_node_to_zval(self->list[self_object->iter], return_value);
+	} else {
+		RETURN_NULL();
+	}
 }
 
 PHP_METHOD(Collection, offsetSet) {
-	
+	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
+	zend_throw_exception_ex(html5_dom_exception_ce, 0, "collection readonly");
 }
 
 PHP_METHOD(Collection, offsetUnset) {
-	
+	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
+	zend_throw_exception_ex(html5_dom_exception_ce, 0, "collection readonly");
 }
 
 PHP_METHOD(Collection, current) {
+	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
 	
+	if (self_object->iter >= 0 && self_object->iter < self->length) {
+		html5_dom_node_to_zval(self->list[self_object->iter], return_value);
+	} else {
+		RETURN_NULL();
+	}
 }
 
 PHP_METHOD(Collection, next) {
-	
+	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
+	++self_object->iter;
 }
 
 PHP_METHOD(Collection, key) {
-	
+	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
+	RETURN_LONG(self_object->iter);
 }
 
 PHP_METHOD(Collection, valid) {
-	
+	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
+	RETURN_BOOL(self_object->iter >= 0 && self_object->iter < self->length);
 }
 
 PHP_METHOD(Collection, rewind) {
-	
+	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
+	self_object->iter = 0;
 }

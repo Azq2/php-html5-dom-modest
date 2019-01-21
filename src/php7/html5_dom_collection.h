@@ -15,11 +15,21 @@ static zend_object *html5_dom_collection_create_object(zend_class_entry *ce TSRM
 void html5_dom_collection_to_zval(myhtml_tree_t *tree, myhtml_collection_t *collection, zval *retval);
 
 PHP_METHOD(Collection, __construct);
+
+PHP_METHOD(Collection, array);
+PHP_METHOD(Collection, first);
+PHP_METHOD(Collection, last);
+
+// Countable
 PHP_METHOD(Collection, count);
+
+// ArrayAccess
 PHP_METHOD(Collection, offsetExists);
 PHP_METHOD(Collection, offsetGet);
 PHP_METHOD(Collection, offsetSet);
 PHP_METHOD(Collection, offsetUnset);
+
+// Iterator
 PHP_METHOD(Collection, current);
 PHP_METHOD(Collection, next);
 PHP_METHOD(Collection, key);

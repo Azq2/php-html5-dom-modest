@@ -19,6 +19,7 @@ typedef struct {
 	HashTable *prop_handler;	// handlers for class properties
 	zval parent;				// reference to parent object
 	zend_object std;			// self object
+	zend_long iter;				// offset for iterator
 } html5_dom_object_wrap;
 
 typedef int (*html5_dom_prop_handler)(html5_dom_object_wrap *obj, zval *val, int write);
