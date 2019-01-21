@@ -29,6 +29,7 @@ void html5_dom_node_class_init() {
 	php_html5_dom_node_handlers.write_property			= html5_dom_write_property;
 	php_html5_dom_node_handlers.get_property_ptr_ptr	= html5_dom_get_property_ptr_ptr;
 	php_html5_dom_node_handlers.has_property			= html5_dom_has_property;
+	php_html5_dom_node_handlers.get_debug_info			= html5_dom_get_debug_info;
 	
 	INIT_CLASS_ENTRY(ce, "HTML5\\DOM\\Node", php_html5_dom_node_methods);
 	ce.create_object = html5_dom_node_create_object;

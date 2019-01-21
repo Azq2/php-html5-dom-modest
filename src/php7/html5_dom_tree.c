@@ -66,6 +66,7 @@ void html5_dom_tree_class_init() {
 	php_html5_dom_tree_handlers.write_property			= html5_dom_write_property;
 	php_html5_dom_tree_handlers.get_property_ptr_ptr	= html5_dom_get_property_ptr_ptr;
 	php_html5_dom_tree_handlers.has_property			= html5_dom_has_property;
+	php_html5_dom_tree_handlers.get_debug_info			= html5_dom_get_debug_info;
 	
 	zend_class_entry ce;
 	INIT_CLASS_ENTRY(ce, "HTML5\\DOM\\Tree", php_html5_dom_tree_methods);
@@ -529,8 +530,9 @@ static int html5_dom_tree__parser(html5_dom_object_wrap *obj, zval *val, int wri
 	html5_dom_tree_t *self = (html5_dom_tree_t *) obj->ptr;
 	
 	if (!write) {
-		zval *parent = self->parent;
-		ZVAL_COPY(val, parent);
+		html5_dom_object_wrap *parent_intern = html5_dom_object_unwrap(Z_OBJ_P(&obj->parent));
+		GC_REFCOUNT(&parent_intern->std)++;
+		ZVAL_OBJ(val, &parent_intern->std);
 		return 1;
 	}
 	

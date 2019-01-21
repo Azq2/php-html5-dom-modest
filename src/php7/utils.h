@@ -36,6 +36,8 @@ void html5_dom_prop_handler_free(HashTable *hash);
 
 zval *html5_dom_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot);
 zval *html5_dom_read_property(zval *object, zval *member, int type, void **cache_slot, zval *rv);
+HashTable *html5_dom_get_debug_info(zval *object, int *is_temp);
+int html5_dom_has_property(zval *object, zval *member, int has_set_exists, void **cache_slot);
 
 #if PHP_VERSION_ID > 70400
 // In php 7.4 write_property must return value
@@ -43,8 +45,6 @@ zval *html5_dom_write_property(zval *object, zval *member, zval *value, void **c
 #else
 void html5_dom_write_property(zval *object, zval *member, zval *value, void **cache_slot);
 #endif
-
-int html5_dom_has_property(zval *object, zval *member, int has_set_exists, void **cache_slot);
 
 void *html5_dom_zend_object_alloc(size_t obj_size, zend_class_entry *ce);
 

@@ -157,3 +157,30 @@ int html5_dom_has_property(zval *object, zval *member, int has_set_exists, void 
 	
 	return retval;
 }
+
+HashTable *html5_dom_get_debug_info(zval *object, int *is_temp) {
+	html5_dom_object_wrap *obj = html5_dom_object_unwrap(Z_OBJ_P(object));
+	
+	*is_temp = 1;
+	
+	HashTable *debug_info, *std_props;
+	zend_string *string_key;
+	html5_dom_prop_handler handler;
+	
+	std_props = zend_std_get_properties(object);
+	debug_info = zend_array_dup(std_props);
+	
+	if (!obj->prop_handler)
+		return debug_info;
+	
+	ZEND_HASH_FOREACH_STR_KEY_PTR(obj->prop_handler, string_key, handler) {
+		zval value;
+		
+		if (!handler(obj, &value, 0) || !string_key)
+			continue;
+		
+		zend_hash_add(debug_info, string_key, &value);
+	} ZEND_HASH_FOREACH_END();
+	
+	return debug_info;
+}

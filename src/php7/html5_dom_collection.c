@@ -61,6 +61,7 @@ void html5_dom_collection_class_init() {
 	php_html5_dom_collection_handlers.write_property		= html5_dom_write_property;
 	php_html5_dom_collection_handlers.get_property_ptr_ptr	= html5_dom_get_property_ptr_ptr;
 	php_html5_dom_collection_handlers.has_property			= html5_dom_has_property;
+	php_html5_dom_collection_handlers.get_debug_info		= html5_dom_get_debug_info;
 	
 	INIT_CLASS_ENTRY(ce, "HTML5\\DOM\\Collection", php_html5_dom_collection_methods);
 	ce.create_object = html5_dom_collection_create_object;
@@ -69,6 +70,8 @@ void html5_dom_collection_class_init() {
 	zend_class_implements(html5_dom_collection_ce, 3, zend_ce_countable, zend_ce_arrayaccess, zend_ce_iterator);
 	
 	html5_dom_prop_handler_list handlers[] = {
+		{"length",			html5_dom_collection__length}, 
+		{"items",			html5_dom_collection__items}, 
 		{"",				NULL}, 
 	};
 	html5_dom_prop_handler_init(&php_html5_dom_collection_prop_handlers, handlers);
@@ -218,4 +221,34 @@ PHP_METHOD(Collection, valid) {
 PHP_METHOD(Collection, rewind) {
 	HTML5_DOM_METHOD_PARAMS(myhtml_collection_t);
 	self_object->iter = 0;
+}
+
+/*
+	Acessors
+*/
+static int html5_dom_collection__length(html5_dom_object_wrap *obj, zval *val, int write) {
+	myhtml_collection_t *self = (myhtml_collection_t *) obj->ptr;
+	
+	if (!write) {
+		ZVAL_LONG(val, self->length);
+		return 1;
+	}
+	
+	return 0;
+}
+
+static int html5_dom_collection__items(html5_dom_object_wrap *obj, zval *val, int write) {
+	myhtml_collection_t *self = (myhtml_collection_t *) obj->ptr;
+	
+	if (!write) {
+		array_init(val);
+		for (size_t i = 0; i < self->length; ++i) {
+			zval tmp;
+			html5_dom_node_to_zval(self->list[0], &tmp);
+			add_index_zval(val, i, &tmp);
+		}
+		return 1;
+	}
+	
+	return 0;
 }
