@@ -8,7 +8,7 @@
 
 #include "zend_exceptions.h"
 
-#define HTML5_DOM_TREE_FIELD_METHOD_RO(___method, ___field) \
+#define HTML5_DOM_FIELD_METHOD_RO(___method, ___field) \
 	PHP_METHOD(Tree, ___method) { \
 		HTML5_DOM_METHOD_PARAMS(html5_dom_tree_t); \
 		html5_dom_tree__##___field(self_object, return_value, 0); \
@@ -99,11 +99,11 @@ static zend_object *html5_dom_tree_create_object(zend_class_entry *ce TSRMLS_DC)
 }
 
 static void html5_dom_tree_free_obj(zend_object *object TSRMLS_DC) {
-	html5_dom_object_wrap *obj = html5_dom_object_unwrap(object);
+	html5_dom_object_wrap *intern = html5_dom_object_unwrap(object);
 	
-	DOM_GC_TRACE("DOM::Tree::DESTROY (refs=%d, obj->ptr=%p)", GC_REFCOUNT(&obj->std), obj->ptr);
+	DOM_GC_TRACE("DOM::Tree::DESTROY (refs=%d)", GC_REFCOUNT(&intern->std));
 	
-	html5_dom_tree_t *tree_obj = (html5_dom_tree_t *) obj->ptr;
+	html5_dom_tree_t *tree_obj = (html5_dom_tree_t *) intern->ptr;
 	if (tree_obj) {
 		if (tree_obj->used) {
 			tree_obj->tree->context = NULL;
@@ -112,10 +112,10 @@ static void html5_dom_tree_free_obj(zend_object *object TSRMLS_DC) {
 		}
 		
 		efree(tree_obj);
+		zval_ptr_dtor(&intern->parent);
 	}
 	
-	zval_ptr_dtor(&obj->parent);
-	html5_dom_object_wrap_free(obj);
+	html5_dom_object_wrap_free(intern);
 }
 
 void html5_dom_tree_class_unload() {
@@ -509,13 +509,13 @@ PHP_METHOD(Tree, id2namespace) {
 	}
 }
 
-HTML5_DOM_TREE_FIELD_METHOD_RO(document, document);
-HTML5_DOM_TREE_FIELD_METHOD_RO(root, root);
-HTML5_DOM_TREE_FIELD_METHOD_RO(head, head);
-HTML5_DOM_TREE_FIELD_METHOD_RO(body, body);
-HTML5_DOM_TREE_FIELD_METHOD_RO(encoding, encoding);
-HTML5_DOM_TREE_FIELD_METHOD_RO(encodingId, encodingId);
-HTML5_DOM_TREE_FIELD_METHOD_RO(parser, parser);
+HTML5_DOM_FIELD_METHOD_RO(document, document);
+HTML5_DOM_FIELD_METHOD_RO(root, root);
+HTML5_DOM_FIELD_METHOD_RO(head, head);
+HTML5_DOM_FIELD_METHOD_RO(body, body);
+HTML5_DOM_FIELD_METHOD_RO(encoding, encoding);
+HTML5_DOM_FIELD_METHOD_RO(encodingId, encodingId);
+HTML5_DOM_FIELD_METHOD_RO(parser, parser);
 
 /*
 	Property acessors

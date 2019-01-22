@@ -82,26 +82,30 @@ static void html5_dom_node_free_obj(zend_object *object TSRMLS_DC) {
 	
 	myhtml_tree_node_t *self = (myhtml_tree_node_t *) intern->ptr;
 	
-	myhtml_node_set_data(self, NULL);
-	if (!myhtml_node_parent(self) && self != myhtml_tree_get_document(self->tree)) {
-		if (self == self->tree->node_html) {
-			self->tree->node_html = NULL;
-		} else if (self == self->tree->node_body) {
-			self->tree->node_body = NULL;
-		} else if (self == self->tree->node_head) {
-			self->tree->node_head = NULL;
-		} else if (self == self->tree->node_form) {
-			self->tree->node_form = NULL;
-		} else if (self == self->tree->fragment) {
-			self->tree->fragment = NULL;
-		} else if (self == self->tree->document) {
-			self->tree->document = NULL;
+	if (self) {
+		myhtml_node_set_data(self, NULL);
+		if (!myhtml_node_parent(self) && self != myhtml_tree_get_document(self->tree)) {
+			if (self == self->tree->node_html) {
+				self->tree->node_html = NULL;
+			} else if (self == self->tree->node_body) {
+				self->tree->node_body = NULL;
+			} else if (self == self->tree->node_head) {
+				self->tree->node_head = NULL;
+			} else if (self == self->tree->node_form) {
+				self->tree->node_form = NULL;
+			} else if (self == self->tree->fragment) {
+				self->tree->fragment = NULL;
+			} else if (self == self->tree->document) {
+				self->tree->document = NULL;
+			}
+			DOM_GC_TRACE("=> DOM::Node::FREE");
+			html5_tree_node_delete_recursive(self);
 		}
-		DOM_GC_TRACE("=> DOM::Node::FREE");
-		html5_tree_node_delete_recursive(self);
+		
+		zval_ptr_dtor(&intern->parent);
 	}
 	
-	zval_ptr_dtor(&intern->parent);
+	html5_dom_object_wrap_free(intern);
 }
 
 void html5_dom_node_class_unload() {

@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "zend_smart_str.h"
 
 void *html5_dom_zend_object_alloc(size_t obj_size, zend_class_entry *ce) {
 	void *obj = emalloc(obj_size + zend_object_properties_size(ce));
@@ -34,6 +35,11 @@ void html5_dom_prop_handler_init(HashTable *hash, html5_dom_prop_handler_list *h
 
 void html5_dom_prop_handler_free(HashTable *hash) {
 	zend_hash_destroy(hash);
+}
+
+mystatus_t html5_dom_serialization_callback(const char *data, size_t len, void *ctx) {
+	smart_str_appendl((smart_str *) ctx, data, len);
+	return MyCORE_STATUS_OK;
 }
 
 /*

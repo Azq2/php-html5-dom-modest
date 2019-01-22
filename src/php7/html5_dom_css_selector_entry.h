@@ -1,5 +1,5 @@
-#ifndef PHP_HTML5_DOM_CSS_H
-#define PHP_HTML5_DOM_CSS_H
+#ifndef PHP_HTML5_DOM_CSS_SELECTOR_ENTRY_H
+#define PHP_HTML5_DOM_CSS_SELECTOR_ENTRY_H
 
 #include "php.h"
 #include "html5_dom.h"
@@ -14,4 +14,4 @@ static zend_object *html5_dom_css_selector_entry_create_object(zend_class_entry 
 
 PHP_METHOD(Entry, __construct);
 
-#endif // PHP_HTML5_DOM_CSS_H
+#endif // PHP_HTML5_DOM_CSS_SELECTOR_ENTRY_H

@@ -55,6 +55,13 @@ static void html5_dom_css_selector_entry_free_obj(zend_object *object TSRMLS_DC)
 	html5_dom_object_wrap *intern = html5_dom_object_unwrap(object);
 	
 	DOM_GC_TRACE("DOM::CSS::Selector::Entry::DESTROY (refs=%d)", GC_REFCOUNT(&intern->std));
+	
+	if (intern->ptr) {
+		efree(intern->ptr);
+		zval_ptr_dtor(&intern->parent);
+	}
+	
+	html5_dom_object_wrap_free(intern);
 }
 
 void html5_dom_css_selector_entry_class_unload() {
