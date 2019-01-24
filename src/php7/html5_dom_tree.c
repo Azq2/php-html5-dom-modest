@@ -5,6 +5,8 @@
 #include "html5_dom_tree.h"
 #include "html5_dom_parser.h"
 #include "html5_dom_collection.h"
+#include "html5_dom_css_selector.h"
+#include "html5_dom_css_selector_entry.h"
 
 #include "zend_exceptions.h"
 
@@ -138,22 +140,24 @@ void html5_dom_find(zval *retval, html5_dom_parser_t *parser, myhtml_tree_node_t
 	
 	// Precompiled selector
 	if (Z_TYPE_P(selector) == IS_OBJECT) {
-		/*
-			if (sv_derived_from(query, "HTML5::DOM::CSS::Selector")) { // Precompiler selectors
-				html5_css_selector_t *selector = INT2PTR(html5_css_selector_t *, SvIV((SV*)SvRV(query)));
+		if (instanceof_function(Z_OBJCE_P(selector), html5_dom_css_selector_ce)) {
+			html5_dom_object_wrap *intern = html5_dom_object_unwrap(Z_OBJ_P(selector));
+			html5_css_selector_t *selector = (html5_css_selector_t *) intern->ptr;
+			
+			if (selector->list) {
 				list = selector->list->entries_list;
 				list_size = selector->list->entries_list_length;
-			} else if (sv_derived_from(query, "HTML5::DOM::CSS::Selector::Entry")) { // One precompiled selector
-				html5_css_selector_entry_t *selector = INT2PTR(html5_css_selector_entry_t *, SvIV((SV*)SvRV(query)));
-				list = selector->list;
-				list_size = 1;
-			} else {
-				sub_croak(cv, "%s: %s is not of type %s or %s", "HTML5::DOM::Tree::find", "query", "HTML5::DOM::CSS::Selector", "HTML5::DOM::CSS::Selector::Entry");
 			}
-		*/
-		zend_throw_exception_ex(html5_dom_exception_ce, 0, "invalid selector value (must be a string or precompiled selector)");
-		ZVAL_NULL(retval);
-		return;
+		} else if (instanceof_function(Z_OBJCE_P(selector), html5_dom_css_selector_entry_ce)) {
+			html5_dom_object_wrap *intern = html5_dom_object_unwrap(Z_OBJ_P(selector));
+			html5_css_selector_entry_t *selector = (html5_css_selector_entry_t *) intern->ptr;
+			list = selector->list;
+			list_size = 1;
+		} else {
+			zend_throw_exception_ex(html5_dom_exception_ce, 0, "invalid selector value (must be a string or precompiled selector)");
+			ZVAL_NULL(retval);
+			return;
+		}
 	}
 	// Selector from string
 	else {
