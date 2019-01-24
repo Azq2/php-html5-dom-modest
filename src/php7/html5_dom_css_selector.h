@@ -17,6 +17,9 @@ static int html5_dom_css_selector__valid(html5_dom_object_wrap *obj, zval *val, 
 static int html5_dom_css_selector__length(html5_dom_object_wrap *obj, zval *val, int write);
 static int html5_dom_css_selector__entries(html5_dom_object_wrap *obj, zval *val, int write);
 
+void html5_dom_css_serialize_selector(html5_css_selector_t *self, mycss_selectors_list_t *selector, zval *result);
+void html5_dom_css_serialize_entry(html5_css_selector_t *self, mycss_selectors_list_t *selector, mycss_selectors_entry_t *entry, zval *result);
+
 PHP_METHOD(Selector, __construct);
 PHP_METHOD(Selector, text); // field
 PHP_METHOD(Selector, valid); // field

@@ -30,10 +30,11 @@ ZEND_END_ARG_INFO()
 
 static zend_function_entry php_html5_dom_css_selector_methods[] = {
 	PHP_ME(Selector, __construct,	arginfo_css_selector_void,			ZEND_ACC_PRIVATE | ZEND_ACC_CTOR)
-	PHP_ME(Selector, text,			arginfo_css_selector_void,			ZEND_ACC_PRIVATE)
-	PHP_ME(Selector, valid,			arginfo_css_selector_void,			ZEND_ACC_PRIVATE)
-	PHP_ME(Selector, length,		arginfo_css_selector_void,			ZEND_ACC_PRIVATE)
-	PHP_ME(Selector, entry,			arginfo_css_selector_entry,			ZEND_ACC_PRIVATE)
+	PHP_ME(Selector, text,			arginfo_css_selector_void,			ZEND_ACC_PUBLIC)
+	PHP_ME(Selector, ast,			arginfo_css_selector_void,			ZEND_ACC_PUBLIC)
+	PHP_ME(Selector, valid,			arginfo_css_selector_void,			ZEND_ACC_PUBLIC)
+	PHP_ME(Selector, length,		arginfo_css_selector_void,			ZEND_ACC_PUBLIC)
+	PHP_ME(Selector, entry,			arginfo_css_selector_entry,			ZEND_ACC_PUBLIC)
 	
 	// aliases
 	PHP_MALIAS(Selector,	count,		length,				arginfo_css_selector_void,			ZEND_ACC_PUBLIC)
@@ -103,6 +104,246 @@ void html5_dom_css_selector_class_unload() {
 	zend_hash_destroy(&php_html5_dom_css_selector_prop_handlers);
 }
 
+void html5_dom_css_serialize_selector(html5_css_selector_t *self, mycss_selectors_list_t *selector, zval *result) {
+	while (selector) {
+		for (size_t i = 0; i < selector->entries_list_length; ++i) {
+			mycss_selectors_entries_list_t *entries = &selector->entries_list[i];
+			
+			zval chain;
+			array_init(&chain);
+			html5_dom_css_serialize_entry(self, selector, entries->entry, &chain);
+			add_next_index_zval(result, &chain);
+			
+		}
+		selector = selector->next;
+	}
+}
+
+void html5_dom_css_serialize_entry(html5_css_selector_t *self, mycss_selectors_list_t *selector, mycss_selectors_entry_t *entry, zval *result) {
+	// combinators names
+	static const struct {
+		const char name[16];
+		size_t len;
+	} combinators[] = {
+		{"", 0}, 
+		{"descendant", 10},	// >>
+		{"child", 5},		// >
+		{"sibling", 7},		// +
+		{"adjacent", 8},	// ~
+		{"column", 6}		// ||
+	};
+	
+	// attribute eq names
+	static const struct {
+		const char name[16];
+		size_t len;
+	} attr_match_names[] = {
+		{"equal", 5},		// =
+		{"include", 7},		// ~=
+		{"dash", 4},		// |=
+		{"prefix", 6},		// ^=
+		{"suffix", 6},		// $=
+		{"substring", 9}	// *=
+	};
+	
+	while (entry) {
+		if (entry->combinator != MyCSS_SELECTORS_COMBINATOR_UNDEF) {
+			zval data;
+			array_init(&data);
+			add_assoc_stringl_ex(&data, "type", sizeof("type") - 1, "combinator", sizeof("combinator") - 1);
+			add_assoc_stringl_ex(&data, "value", sizeof("value") - 1, combinators[entry->combinator].name, combinators[entry->combinator].len);
+			add_next_index_zval(result, &data);
+		}
+		
+		zval data;
+		array_init(&data);
+		
+		if ((selector->flags) & MyCSS_SELECTORS_FLAGS_SELECTOR_BAD)
+			add_assoc_bool_ex(&data, "invalid", sizeof("invalid") - 1, 1);
+		
+		switch (entry->type) {
+			case MyCSS_SELECTORS_TYPE_ID:
+			case MyCSS_SELECTORS_TYPE_CLASS:
+			case MyCSS_SELECTORS_TYPE_ELEMENT:
+			case MyCSS_SELECTORS_TYPE_PSEUDO_CLASS:
+			case MyCSS_SELECTORS_TYPE_PSEUDO_ELEMENT:
+			{
+				switch (entry->type) {
+					case MyCSS_SELECTORS_TYPE_ELEMENT:
+						add_assoc_stringl_ex(&data, "type", sizeof("type") - 1, "tag", sizeof("tag") - 1);
+					break;
+					case MyCSS_SELECTORS_TYPE_ID:
+						add_assoc_stringl_ex(&data, "type", sizeof("type") - 1, "id", sizeof("id") - 1);
+					break;
+					case MyCSS_SELECTORS_TYPE_CLASS:
+						add_assoc_stringl_ex(&data, "type", sizeof("type") - 1, "class", sizeof("class") - 1);
+					break;
+					case MyCSS_SELECTORS_TYPE_PSEUDO_CLASS:
+						add_assoc_stringl_ex(&data, "type", sizeof("type") - 1, "pseudo-class", sizeof("pseudo-class") - 1);
+					break;
+					case MyCSS_SELECTORS_TYPE_PSEUDO_ELEMENT:
+						add_assoc_stringl_ex(&data, "type", sizeof("type") - 1, "pseudo-element", sizeof("pseudo-element") - 1);
+					break;
+				}
+				
+				if (entry->key)
+					add_assoc_stringl_ex(&data, "value", sizeof("value") - 1, entry->key->data ? entry->key->data : "", entry->key->length);
+			}
+			break;
+			case MyCSS_SELECTORS_TYPE_ATTRIBUTE:
+			{
+				add_assoc_stringl_ex(&data, "type", sizeof("type") - 1, "attribute", sizeof("attribute") - 1);
+				
+				/* key */
+				if (entry->key)
+					add_assoc_stringl_ex(&data, "name", sizeof("name") - 1, entry->key->data ? entry->key->data : "", entry->key->length);
+				
+				/* value */
+				if (mycss_selector_value_attribute(entry->value)->value) {
+					mycore_string_t *str_value = mycss_selector_value_attribute(entry->value)->value;
+					add_assoc_stringl_ex(&data, "value", sizeof("value") - 1, str_value->data ? str_value->data : "", str_value->length);
+				} else {
+					add_assoc_stringl_ex(&data, "value", sizeof("value") - 1, "", 0);
+				}
+				
+				/* match */
+				int match = mycss_selector_value_attribute(entry->value)->match;
+				add_assoc_stringl_ex(&data, "match", sizeof("match") - 1, attr_match_names[match].name, attr_match_names[match].len);
+				
+				/* modificator */
+				if (mycss_selector_value_attribute(entry->value)->mod & MyCSS_SELECTORS_MOD_I) {
+					add_assoc_bool_ex(&data, "ignoreCase", sizeof("ignoreCase") - 1, 1);
+				} else {
+					add_assoc_bool_ex(&data, "ignoreCase", sizeof("ignoreCase") - 1, 0);
+				}
+			}
+			break;
+			case MyCSS_SELECTORS_TYPE_PSEUDO_CLASS_FUNCTION:
+			{
+				add_assoc_stringl_ex(&data, "type", sizeof("type") - 1, "function", sizeof("function") - 1);
+				
+				switch (entry->sub_type) {
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_CONTAINS:
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_HAS:
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_NOT:
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_MATCHES:
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_CURRENT:
+					{
+						switch (entry->sub_type) {
+							case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_CONTAINS:
+								add_assoc_stringl_ex(&data, "name", sizeof("name") - 1, "contains", sizeof("contains") - 1);
+							break;
+							case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_HAS:
+								add_assoc_stringl_ex(&data, "name", sizeof("name") - 1, "has", sizeof("has") - 1);
+							break;
+							case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_NOT:
+								add_assoc_stringl_ex(&data, "name", sizeof("name") - 1, "not", sizeof("not") - 1);
+							break;
+							case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_MATCHES:
+								add_assoc_stringl_ex(&data, "name", sizeof("name") - 1, "matches", sizeof("matches") - 1);
+							break;
+							case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_CURRENT:
+								add_assoc_stringl_ex(&data, "name", sizeof("name") - 1, "current", sizeof("current") - 1);
+							break;
+						}
+						
+						zval value;
+						array_init(&value);
+						html5_dom_css_serialize_selector(self, entry->value, &value);
+						add_assoc_zval_ex(&value, "value", sizeof("value") - 1, &value);
+					}
+					break;
+					
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_NTH_CHILD:
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_NTH_LAST_CHILD:
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_NTH_COLUMN:
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_NTH_LAST_COLUMN:
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_NTH_OF_TYPE:
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_NTH_LAST_OF_TYPE:
+					{
+						mycss_an_plus_b_entry_t *a_plus_b = mycss_selector_value_an_plus_b(entry->value);
+						
+						add_assoc_stringl_ex(&data, "name", sizeof("name") - 1, "nth-child", sizeof("nth-child") - 1);
+						add_assoc_long_ex(&data, "a", sizeof("a") - 1, a_plus_b->a);
+						add_assoc_long_ex(&data, "b", sizeof("b") - 1, a_plus_b->b);
+						
+						if (a_plus_b->of) {
+							zval of;
+							array_init(&of);
+							html5_dom_css_serialize_selector(self, a_plus_b->of, &of);
+							add_assoc_zval_ex(&data, "of", sizeof("of") - 1, &of);
+						}
+					}
+					break;
+					
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_DIR:
+					{
+						add_assoc_stringl_ex(&data, "name", sizeof("name") - 1, "dir", sizeof("dir") - 1);
+						if (entry->value) {
+							mycore_string_t *str_fname = mycss_selector_value_string(entry->value);
+							add_assoc_stringl_ex(&data, "value", sizeof("value") - 1, str_fname->data ? str_fname->data : "", str_fname->length);
+						} else {
+							add_assoc_stringl_ex(&data, "value", sizeof("value") - 1, "", 0);
+						}
+					}
+					break;
+					
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_DROP:
+					{
+						add_assoc_stringl_ex(&data, "name", sizeof("name") - 1, "drop", sizeof("drop") - 1);
+						mycss_selectors_function_drop_type_t drop_val = mycss_selector_value_drop(entry->value);
+						
+						zval langs;
+						array_init(&langs);
+						
+						if (drop_val & MyCSS_SELECTORS_FUNCTION_DROP_TYPE_ACTIVE)
+							add_next_index_stringl(&langs, "active", sizeof("active") - 1);
+						if (drop_val & MyCSS_SELECTORS_FUNCTION_DROP_TYPE_VALID)
+							add_next_index_stringl(&langs, "valid", sizeof("valid") - 1);
+						if (drop_val & MyCSS_SELECTORS_FUNCTION_DROP_TYPE_INVALID)
+							add_next_index_stringl(&langs, "invalid", sizeof("invalid") - 1);
+						
+						add_assoc_zval_ex(&data, "value", sizeof("value") - 1, &langs);
+					}
+					break;
+					
+					case MyCSS_SELECTORS_SUB_TYPE_PSEUDO_CLASS_FUNCTION_LANG:
+					{
+						add_assoc_stringl_ex(&data, "name", sizeof("name") - 1, "lang", sizeof("lang") - 1);
+						
+						zval langs;
+						array_init(&langs);
+						
+						if (entry->value) {
+							mycss_selectors_value_lang_t *lang = mycss_selector_value_lang(entry->value);
+							while (lang) {
+								add_next_index_stringl(&langs, lang->str.data ? lang->str.data : "", lang->str.length);
+								lang = lang->next;
+							}
+						}
+						
+						add_assoc_zval_ex(&data, "value", sizeof("value") - 1, &langs);
+					}
+					break;
+					
+					default:
+						add_assoc_stringl_ex(&data, "name", sizeof("name") - 1, "unknown", sizeof("unknown") - 1);
+					break;
+				}
+			}
+			break;
+			
+			default:
+				add_assoc_stringl_ex(&data, "type", sizeof("type") - 1, "unknown", sizeof("unknown") - 1);
+			break;
+		}
+		
+		add_next_index_zval(result, &data);
+		
+		entry = entry->next;
+	}
+}
+
 static void html5_dom_selector_entry_to_zval(mycss_selectors_entries_list_t *list, html5_css_selector_t *selector, html5_dom_object_wrap *parent_intern, zval *retval) {
 	html5_css_selector_entry_t *entry = (html5_css_selector_entry_t *) emalloc(sizeof(html5_css_selector_entry_t));
 	entry->selector = selector;
@@ -132,7 +373,11 @@ PHP_METHOD(Selector, __construct) {
 }
 
 PHP_METHOD(Selector, ast) {
+	HTML5_DOM_METHOD_PARAMS(html5_css_selector_t);
 	
+	array_init(return_value);
+	if (self->list)
+		html5_dom_css_serialize_selector(self, self->list, return_value);
 }
 
 PHP_METHOD(Selector, entry) {
