@@ -12,8 +12,8 @@ void html5_dom_collection_class_unload();
 static void html5_dom_collection_free_obj(zend_object *object TSRMLS_DC);
 static zend_object *html5_dom_collection_create_object(zend_class_entry *ce TSRMLS_DC);
 
-static int html5_dom_collection__length(html5_dom_object_wrap *obj, zval *val, int write);
-static int html5_dom_collection__items(html5_dom_object_wrap *obj, zval *val, int write);
+static int html5_dom_collection__length(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_collection__items(html5_dom_object_wrap *obj, zval *val, int write, int debug);
 
 void html5_dom_collection_to_zval(myhtml_tree_t *tree, myhtml_collection_t *collection, zval *retval);
 

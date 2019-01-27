@@ -231,7 +231,7 @@ PHP_METHOD(Collection, rewind) {
 /*
 	Acessors
 */
-static int html5_dom_collection__length(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_collection__length(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	myhtml_collection_t *self = (myhtml_collection_t *) obj->ptr;
 	
 	if (!write) {
@@ -242,7 +242,7 @@ static int html5_dom_collection__length(html5_dom_object_wrap *obj, zval *val, i
 	return 0;
 }
 
-static int html5_dom_collection__items(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_collection__items(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	myhtml_collection_t *self = (myhtml_collection_t *) obj->ptr;
 	
 	if (!write) {

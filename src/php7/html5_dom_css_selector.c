@@ -11,7 +11,7 @@
 #define HTML5_DOM_FIELD_METHOD_RO(___method, ___field) \
 	PHP_METHOD(Selector, ___method) { \
 		HTML5_DOM_METHOD_PARAMS(html5_css_selector_t); \
-		html5_dom_css_selector__##___field(self_object, return_value, 0); \
+		html5_dom_css_selector__##___field(self_object, return_value, 0, 0); \
 	}
 
 /*
@@ -403,7 +403,7 @@ HTML5_DOM_FIELD_METHOD_RO(entries, entries);
 	Acessors
 */
 
-static int html5_dom_css_selector__text(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_css_selector__text(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	html5_css_selector_t *self = (html5_css_selector_t *) obj->ptr;
 	
 	if (!write) {
@@ -426,7 +426,7 @@ static int html5_dom_css_selector__text(html5_dom_object_wrap *obj, zval *val, i
 	return 0;
 }
 
-static int html5_dom_css_selector__valid(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_css_selector__valid(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	html5_css_selector_t *self = (html5_css_selector_t *) obj->ptr;
 	
 	if (!write) {
@@ -437,7 +437,7 @@ static int html5_dom_css_selector__valid(html5_dom_object_wrap *obj, zval *val, 
 	return 0;
 }
 
-static int html5_dom_css_selector__length(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_css_selector__length(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	html5_css_selector_t *self = (html5_css_selector_t *) obj->ptr;
 	
 	if (!write) {
@@ -448,7 +448,7 @@ static int html5_dom_css_selector__length(html5_dom_object_wrap *obj, zval *val,
 	return 0;
 }
 
-static int html5_dom_css_selector__entries(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_css_selector__entries(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	html5_css_selector_t *self = (html5_css_selector_t *) obj->ptr;
 	
 	if (!write) {

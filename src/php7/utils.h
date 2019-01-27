@@ -22,7 +22,7 @@ typedef struct {
 	zend_long iter;				// offset for iterator
 } html5_dom_object_wrap;
 
-typedef int (*html5_dom_prop_handler)(html5_dom_object_wrap *obj, zval *val, int write);
+typedef int (*html5_dom_prop_handler)(html5_dom_object_wrap *obj, zval *val, int write, int debug);
 
 typedef struct {
 	const char name[64];
@@ -32,6 +32,7 @@ typedef struct {
 void html5_dom_node_to_zval(myhtml_tree_node_t *node, zval *retval);
 
 void html5_dom_prop_handler_init(HashTable *hash, html5_dom_prop_handler_list *handlers);
+void html5_dom_prop_handler_add(HashTable *hash, html5_dom_prop_handler_list *handlers);
 void html5_dom_prop_handler_free(HashTable *hash);
 
 zval *html5_dom_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot);

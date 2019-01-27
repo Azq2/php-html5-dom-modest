@@ -12,10 +12,10 @@ void html5_dom_css_selector_class_unload();
 static void html5_dom_css_selector_free_obj(zend_object *object TSRMLS_DC);
 static zend_object *html5_dom_css_selector_create_object(zend_class_entry *ce TSRMLS_DC);
 
-static int html5_dom_css_selector__text(html5_dom_object_wrap *obj, zval *val, int write);
-static int html5_dom_css_selector__valid(html5_dom_object_wrap *obj, zval *val, int write);
-static int html5_dom_css_selector__length(html5_dom_object_wrap *obj, zval *val, int write);
-static int html5_dom_css_selector__entries(html5_dom_object_wrap *obj, zval *val, int write);
+static int html5_dom_css_selector__text(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_css_selector__valid(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_css_selector__length(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_css_selector__entries(html5_dom_object_wrap *obj, zval *val, int write, int debug);
 
 void html5_dom_css_serialize_selector(html5_css_selector_t *self, mycss_selectors_list_t *selector, zval *result);
 void html5_dom_css_serialize_entry(html5_css_selector_t *self, mycss_selectors_list_t *selector, mycss_selectors_entry_t *entry, zval *result);

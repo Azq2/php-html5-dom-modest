@@ -12,13 +12,13 @@ void html5_dom_tree_class_unload();
 static void html5_dom_tree_free_obj(zend_object *object TSRMLS_DC);
 static zend_object *html5_dom_tree_create_object(zend_class_entry *ce TSRMLS_DC);
 
-static int html5_dom_tree__encoding(html5_dom_object_wrap *obj, zval *val, int write);
-static int html5_dom_tree__encodingId(html5_dom_object_wrap *obj, zval *val, int write);
-static int html5_dom_tree__document(html5_dom_object_wrap *obj, zval *val, int write);
-static int html5_dom_tree__root(html5_dom_object_wrap *obj, zval *val, int write);
-static int html5_dom_tree__head(html5_dom_object_wrap *obj, zval *val, int write);
-static int html5_dom_tree__body(html5_dom_object_wrap *obj, zval *val, int write);
-static int html5_dom_tree__parser(html5_dom_object_wrap *obj, zval *val, int write);
+static int html5_dom_tree__encoding(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_tree__encodingId(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_tree__document(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_tree__root(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_tree__head(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_tree__body(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_tree__parser(html5_dom_object_wrap *obj, zval *val, int write, int debug);
 
 void html5_dom_find(zval *retval, html5_dom_parser_t *parser, myhtml_tree_node_t *scope, zval *selector, zend_string *combinator, int one);
 void html5_dom_simple_find(zval *retval, myhtml_tree_node_t *self, zend_string *key, zend_string *val, zend_string *cmp, zend_bool icase, char type);

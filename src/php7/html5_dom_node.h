@@ -21,6 +21,50 @@ static zend_object *html5_dom_node_create_object(zend_class_entry *ce TSRMLS_DC)
 void html5_dom_node_to_zval(myhtml_tree_node_t *node, zval *retval);
 
 // Node
+static int html5_dom_node__tag(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__tagName(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__nodeName(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__tagId(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__namespace(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__namespaceId(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__tree(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__nodeType(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__next(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__prev(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__nextNode(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__prevNode(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__first(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__last(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__firstNode(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__lastNode(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__html(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__innerHTML(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__outerHTML(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__text(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__innerText(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__outerText(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__textContent(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__nodeHtml(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__nodeValue(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__data(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__isConnected(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__parent(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__document(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__void(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node__selfClosed(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+
+// Element
+static int html5_dom_node_element__children(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node_element__childrenNode(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node_element__className(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node_element__classList(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+
+// DocType
+static int html5_dom_node_doctype__name(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node_doctype__systemId(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+static int html5_dom_node_doctype__publicId(html5_dom_object_wrap *obj, zval *val, int write, int debug);
+
+// Node
 PHP_METHOD(Node, __construct);
 PHP_METHOD(Node, tag); // field
 PHP_METHOD(Node, nodeName); // field

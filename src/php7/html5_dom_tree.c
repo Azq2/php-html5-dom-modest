@@ -13,7 +13,7 @@
 #define HTML5_DOM_FIELD_METHOD_RO(___method, ___field) \
 	PHP_METHOD(Tree, ___method) { \
 		HTML5_DOM_METHOD_PARAMS(html5_dom_tree_t); \
-		html5_dom_tree__##___field(self_object, return_value, 0); \
+		html5_dom_tree__##___field(self_object, return_value, 0, 0); \
 	}
 
 /*
@@ -524,7 +524,7 @@ HTML5_DOM_FIELD_METHOD_RO(parser, parser);
 /*
 	Property acessors
 */
-static int html5_dom_tree__encoding(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_tree__encoding(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	html5_dom_tree_t *self = (html5_dom_tree_t *) obj->ptr;
 	
 	if (!write) {
@@ -539,7 +539,7 @@ static int html5_dom_tree__encoding(html5_dom_object_wrap *obj, zval *val, int w
 	return 0;
 }
 
-static int html5_dom_tree__encodingId(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_tree__encodingId(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	html5_dom_tree_t *self = (html5_dom_tree_t *) obj->ptr;
 	
 	if (!write) {
@@ -550,7 +550,7 @@ static int html5_dom_tree__encodingId(html5_dom_object_wrap *obj, zval *val, int
 	return 0;
 }
 
-static int html5_dom_tree__document(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_tree__document(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	html5_dom_tree_t *self = (html5_dom_tree_t *) obj->ptr;
 	
 	if (!write) {
@@ -561,7 +561,7 @@ static int html5_dom_tree__document(html5_dom_object_wrap *obj, zval *val, int w
 	return 0;
 }
 
-static int html5_dom_tree__root(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_tree__root(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	html5_dom_tree_t *self = (html5_dom_tree_t *) obj->ptr;
 	
 	if (!write) {
@@ -572,7 +572,7 @@ static int html5_dom_tree__root(html5_dom_object_wrap *obj, zval *val, int write
 	return 0;
 }
 
-static int html5_dom_tree__head(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_tree__head(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	html5_dom_tree_t *self = (html5_dom_tree_t *) obj->ptr;
 	
 	if (!write) {
@@ -583,7 +583,7 @@ static int html5_dom_tree__head(html5_dom_object_wrap *obj, zval *val, int write
 	return 0;
 }
 
-static int html5_dom_tree__body(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_tree__body(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	html5_dom_tree_t *self = (html5_dom_tree_t *) obj->ptr;
 	
 	if (!write) {
@@ -594,7 +594,7 @@ static int html5_dom_tree__body(html5_dom_object_wrap *obj, zval *val, int write
 	return 0;
 }
 
-static int html5_dom_tree__parser(html5_dom_object_wrap *obj, zval *val, int write) {
+static int html5_dom_tree__parser(html5_dom_object_wrap *obj, zval *val, int write, int debug) {
 	html5_dom_tree_t *self = (html5_dom_tree_t *) obj->ptr;
 	
 	if (!write) {
