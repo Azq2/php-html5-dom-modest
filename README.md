@@ -130,20 +130,24 @@
 	- [ ] publicId
 	- [ ] systemId
 
-- [ ] HTML5\DOM\Collection
-	- [ ] __construct
-	- [ ] each
-	- [ ] map
-	- [ ] add
-	- [ ] length
-	- [ ] first
-	- [ ] last
-	- [ ] item
-	- [ ] array
-	- [ ] html
-	- [ ] text
-	- [ ] 
-	- [ ] HTML5\DOM\TokenList
+- [x] HTML5\DOM\Collection
+	- [x] $length
+	- [x] $items
+	- [x] count() / length()
+	- [x] offsetExists(offset)
+	- [x] offsetGet(offset) / item(offset)
+	- [x] offsetSet(offset, value)
+	- [x] offsetUnset(offset)
+	- [x] next()
+	- [x] key()
+	- [x] valid()
+	- [x] rewind()
+	- [x] current()
+	- [x] first()
+	- [x] last()
+	- [x] array() / toArray()
+	
+- [ ] HTML5\DOM\TokenList
 	- [ ] has
 	- [ ] contains
 	- [ ] add
@@ -158,17 +162,16 @@
 	- [ ] tree
 	- [ ] wait
 
-- [ ] HTML5\DOM\CSS
-	- [ ] __construct
-	- [ ] parseSelector
+- [+] HTML5\DOM\CSS
+	- [+] __construct(options)
+	- [+] parseSelector(selector, options)
 
 - [ ] HTML5\DOM\CSS\Selector
-	- [ ] __construct
-	- [ ] text
-	- [ ] ast
-	- [ ] length
-	- [ ] entry
-	- [ ] utf8
+	- [ ] text()
+	- [ ] ast()
+	- [ ] valid()
+	- [ ] length() / count()
+	- [ ] entry(offset)
 
 - [ ] HTML5\DOM\CSS\Selector\Entry
 	- [ ] text
