@@ -1,0 +1,189 @@
+- [ ] HTML5\DOM
+	- [ ] __construct
+	- [ ] parse
+	- [ ] parseChunkStart
+	- [ ] parseChunk
+	- [ ] parseChunkTree
+	- [ ] parseChunkEnd
+	- [ ] parseAsync
+
+- [ ] HTML5\DOM\Tree
+	- [ ] createElement
+	- [ ] createComment
+	- [ ] createTextNode
+	- [ ] parseFragment
+	- [ ] document
+	- [ ] root
+	- [ ] head
+	- [ ] body
+	- [ ] at
+	- [ ] querySelector
+	- [ ] find
+	- [ ] querySelectorAll
+	- [ ] findId
+	- [ ] getElementById
+	- [ ] findTag
+	- [ ] getElementsByTagName
+	- [ ] findClass
+	- [ ] getElementsByClassName
+	- [ ] findAttr
+	- [ ] getElementByAttribute
+	- [ ] encoding
+	- [ ] encodingId
+	- [ ] tag2id
+	- [ ] id2tag
+	- [ ] namespace2id
+	- [ ] id2namespace
+	- [ ] parser
+	- [ ] utf8
+
+- [ ] HTML5\DOM\Node
+	- [ ] tag
+	- [ ] nodeName
+	- [ ] tagId
+	- [ ] namespace
+	- [ ] namespaceId
+	- [ ] tree
+	- [ ] nodeType
+	- [ ] next
+	- [ ] nextElementSibling
+	- [ ] prev
+	- [ ] previousElementSibling
+	- [ ] nextNode
+	- [ ] nextSibling
+	- [ ] prevNode
+	- [ ] previousSibling
+	- [ ] first
+	- [ ] firstElementChild
+	- [ ] last
+	- [ ] lastElementChild
+	- [ ] firstNode
+	- [ ] firstChild
+	- [ ] lastNode
+	- [ ] lastChild
+	- [ ] html
+	- [ ] innerHTML
+	- [ ] outerHTML
+	- [ ] text
+	- [ ] innerText
+	- [ ] outerText
+	- [ ] textContent
+	- [ ] nodeHtml
+	- [ ] nodeValue
+	- [ ] data
+	- [ ] isConnected
+	- [ ] parent
+	- [ ] parentElement
+	- [ ] document
+	- [ ] ownerDocument
+	- [ ] append
+	- [ ] appendChild
+	- [ ] prepend
+	- [ ] prependChild
+	- [ ] replace
+	- [ ] replaceChild
+	- [ ] before
+	- [ ] insertBefore
+	- [ ] after
+	- [ ] insertAfter
+	- [ ] remove
+	- [ ] removeChild
+	- [ ] clone
+	- [ ] cloneNode
+	- [ ] void
+	- [ ] selfClosed
+	- [ ] position
+	- [ ] isSameNode
+
+- [ ] HTML5\DOM\Element
+	- [ ] children
+	- [ ] childrenNode
+	- [ ] childNodes
+	- [ ] attr
+	- [ ] removeAttr
+	- [ ] attrArray
+	- [ ] getAttribute
+	- [ ] setAttribute
+	- [ ] removeAttribute
+	- [ ] className
+	- [ ] classList
+	- [ ] at
+	- [ ] querySelector
+	- [ ] find
+	- [ ] querySelectorAll
+	- [ ] findId
+	- [ ] getElementById
+	- [ ] findTag
+	- [ ] getElementsByTagName
+	- [ ] findClass
+	- [ ] getElementsByClassName
+	- [ ] findAttr
+	- [ ] getElementByAttribute
+	- [ ] getDefaultBoxType
+	- [ ] 
+	- [ ] HTML5\DOM\Document
+	- [ ] HTML5\DOM\Fragment
+	- [ ] HTML5\DOM\Text
+	- [ ] HTML5\DOM\Comment
+	- [ ] HTML5\DOM\DocType
+	- [ ] name
+	- [ ] publicId
+	- [ ] systemId
+
+- [ ] HTML5\DOM\Collection
+	- [ ] __construct
+	- [ ] each
+	- [ ] map
+	- [ ] add
+	- [ ] length
+	- [ ] first
+	- [ ] last
+	- [ ] item
+	- [ ] array
+	- [ ] html
+	- [ ] text
+	- [ ] 
+	- [ ] HTML5\DOM\TokenList
+	- [ ] has
+	- [ ] contains
+	- [ ] add
+	- [ ] remove
+	- [ ] toggle
+	- [ ] length
+	- [ ] item
+	- [ ] each
+
+- [ ] HTML5\DOM\AsyncResult
+	- [ ] parsed
+	- [ ] tree
+	- [ ] wait
+
+- [ ] HTML5\DOM\CSS
+	- [ ] __construct
+	- [ ] parseSelector
+
+- [ ] HTML5\DOM\CSS\Selector
+	- [ ] __construct
+	- [ ] text
+	- [ ] ast
+	- [ ] length
+	- [ ] entry
+	- [ ] utf8
+
+- [ ] HTML5\DOM\CSS\Selector\Entry
+	- [ ] text
+	- [ ] pseudoElement
+	- [ ] ast
+	- [ ] specificity
+	- [ ] specificityArray
+
+- [ ] HTML5\DOM\Encoding
+	- [ ] id2name
+	- [ ] name2id
+	- [ ] detectAuto
+	- [ ] detect
+	- [ ] detectCyrillic
+	- [ ] detectUnicode
+	- [ ] detectByPrescanStream
+	- [ ] detectByCharset
+	- [ ] detectBomAndCut
